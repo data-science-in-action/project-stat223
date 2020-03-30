@@ -1,0 +1,36 @@
+---
+title: "Proposal of Pull Wind"
+author: "Shiying Xiao, Hongli Zhang, Hongyuan Cheng, Yu Wang"
+date: "2020/3/31"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  pdf_document html_document: default
+geometry: tmargin=1.8cm,bmargin=1.8cm,lmargin=2.52cm,rmargin=2.52cm
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1 Background
+
+In December 2019, COVID-19 broke out in Wuhan, China. After more than two months of hard work, the situation of epidemic prevention and control in China has been almost under control, and is developing a positive trend. However, the overseas epidemic is rapidly spreading and is in the outbreak stage. As of March 30, 2020, 638146 cases of COVID-19 and 30105 deaths were confirmed in the world. The epidemic has affected 202 countries and regions. In particular, the rapid spread of the epidemic has a huge impact on the global economic development, making trade growth under certain pressure and bringing shocks to financial markets. As a result, more and more people are focusing on how the overseas epidemics will develop. Therefore, it is of great significance to analyze the change trend of the overseas COVID-19 epidemic and simulation of its future development.
+
+## 2 Research question
+
+COVID-19 epidemic simulation outside China based on SEIR model
+
+## 3 Data
+
+The data repository for the 2019 Novel Coronavirus Visual Dashboard operated by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE)(https://github.com/CSSEGISandData/COVID-19.git).
+
+## 4 Method
+
+SEIR model or SEIRD model
+
+## 5 Challenges in the research process
+
+The outbreak of COVID-19 has become a global pandemic. If we want to simulate the whole process of the epidemic, we can not meet the research needs by using the usual Logistic model, so we need to use the infectious disease model. However, none of the team members were exposed to the infectious disease model, and little was known about medical statistics or biostatistics.
