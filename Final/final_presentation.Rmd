@@ -1,0 +1,278 @@
+---
+title: "COVID-19疫情趋势预测研究"
+subtitle: "——基于SEIR模型和LSTM模型"
+author: "肖世莺 张红丽 成宏媛 王瑜"
+date: "2020/05/29"
+output:
+  xaringan::moon_reader:
+    css: [default, zh-CN.css]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+### 演示内容
+
+### 1 绪论
+
+### 2 研究方法
+
+### 3 实证分析
+
+### 4 讨论
+
+---
+
+class: center, middle
+
+## 1 绪论
+
+---
+
+### 1.1 研究背景
+
+&emsp;&emsp;COVID-19已构成全球性大流行，并已蔓延到世界上大多数国家和地区。通过了解某个地区确诊病例的发展趋势，政府可以采取相应的政策以控制应对疫情。但是，单一的模型估计可能会得出有偏的结果，不同数学模型产生的预测结果是不一致的。
+
+--
+
+&emsp;&emsp;因此，我们基于SEIR模型和LSTM模型，将模拟结果与实际数据进行比较，试图得出客观的结论。
+
+---
+
+### 1.2 文献综述
+
+--
+
+&emsp;&emsp;[1]Zifeng Yang,Zhiqi Zeng. “Modified SEIR and AI prediction of the epidemics trend of COVID-19 in China under public health interventions.” Journal of Thoracic Disease(2020).
+
+&emsp;&emsp;Zifeng Yang和Zhiqi Zeng基于SEIR模型，预测中国疫情规模在2月下旬达到顶峰，到4月底逐步下降。如果将武汉封城时间推迟五天，中国大陆的疫情规模将增加三倍。
+
+--
+
+&emsp;&emsp;[2]卿登莉，火斌昌，杨凤. 大数据视角下遏制新型冠状病毒的举措成效分析[J].统计与管理（2020）
+
+&emsp;&emsp;根据SEIR模型计算有效再生数降为1的时间点，可以看出湖北和全国疫情“拐点”在3月初均已出现。
+
+--
+
+&emsp;&emsp;[3]M.Liu, J.Ning, Y.Du, J.Cao, D.Zhang, J.Wang, M.Chen. Modelling the evolution trajectory of COVID-19 in Wuhan, China: experience and suggestions.
+
+&emsp;&emsp;SEIR模型可有效地捕获了COVID-19的演变轨迹，有效预测COVID-19的峰值，大小和持续时间。
+
+---
+
+&emsp;&emsp;[4]Bingjie Yan, Xiangyan Tang, Boyi Liu, Jun Wang, Yize Zhou, Guopeng Zheng, Qi Zou, Yao Lu, Wenxuan Tu “An Improved Method for the Fitting and Prediction of the Number of COVID-19.” arXiv preprint arXiv：2005.03446(2020).
+
+&emsp;&emsp;LSTM神经网络的拟合度更接近实际值,预测精度较高。
+
+--
+
+&emsp;&emsp;[5]Vinay Kumar Reddy Chimmula, Lei Zhang, Time Series Forecasting of COVID-19 transmission in Canada Using LSTM Networks, Chaos, Solitons and Fractals (2020).
+
+&emsp;&emsp;使用LSTM网络，结果显示爆发的可能终点是2020年6月左右。此外，还比较了加拿大、意大利和美国的传播率，结果表明美国的传播率最高，加拿大的传播率最低。
+
+--
+
+&emsp;&emsp;[6]Novanto Yudistira .“COVID-19 growth prediction using multivariate long short term memory.” arXiv preprint arXiv :2005.04809v1(2020).
+
+&emsp;&emsp;LSTM是一种有前途的预测工具通过从大数据中学习并潜在地传播covid-19大流行能够预测未来的爆发。
+
+---
+
+### 1.3 数据来源
+
+&emsp;&emsp;COVID-19疫情数据来自约翰霍普金斯大学系统科学与工程中心（CSSE）提供的COVID-19全球数据库（https://github.com/CSSEGISandData/COVID-19 or https://coronavirus.jhu.edu/map.html）。
+
+---
+
+class: center, middle
+
+## 2 研究方法
+
+---
+
+### 2.1 SEIR模型
+
+&emsp;&emsp;SEIR模型是带潜伏期的恶性传染病模型。SEIR模型假设总人口不变，将人群分类，每种类型作为一个“仓室”存在，假设在同一“仓室”中的每个个体具有相同的特征。
+
+- $\beta$： $\beta=k*b$ 是与感染者进行接触的人数 $k$ 和接触后感染概率 $b$ 的乘积
+- $\sigma$：潜伏者转化为感染者的概率
+- $\gamma$： $\gamma=1/D$ 是感染人群中恢复健康或者死亡的平均比率，其中 $D$是感染的平均持续时间
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/SEIR.png")
+```
+
+---
+
+&emsp;&emsp;SEIR模型的实质是一个关于时间的常微分方程组。它预测的疾病趋势仅取决于参数和开始时间。
+
+$$\begin{cases}
+\dfrac{dS}{dt}=-\dfrac{\beta SI}{N}\\
+\dfrac{dE}{dt}=\dfrac{\beta SI}{N}-\sigma E\\
+\dfrac{dI}{dt}=\sigma E-\gamma I\\
+\dfrac{dR}{dt}=\gamma I\\
+\end{cases}$$
+
+---
+
+### 2.2 LSTM模型
+
+&emsp;&emsp;LSTM模型（Long Short-Term Memory）是一种用于深度学习领域的RNN神经网络。
+
+--
+
+&emsp;&emsp;RNN是在普通神经网络的基础上增加了隐藏层各单元之间的联系，通过权重将上一个时间序列的值传递到当前的神经元上，上一个时间序列的数据信息可以影响当前时间序列的数据信息，以此来达到记忆功能。虽然RNN具备了记忆功能，但不能记忆太前或者太后的数据，即无法解决长期依赖问题。
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/RNN.png")
+```
+
+---
+
+&emsp;&emsp;LSTM模型在隐藏层各神经元单元之间增加记忆单元，从而控制时间序列信息，每次在LSTM隐藏层的各单元传递时，可通过几个可控门（gate）来控制之前的数据信息和当前数据信息的记忆和遗忘程度，从而达到使RNN记忆更长时间的信息。LSTM增加了记忆功能的可控性。
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/LSTM.png")
+```
+
+---
+
+class: center, middle
+
+## 3 实证分析
+
+---
+
+### 3.1 SEIR模型的模拟评估
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/S1.png")
+```
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/S2.png")
+```
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/S3.png")
+```
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/S4.png")
+```
+
+---
+
+### 3.2 LSTM模型的模拟评估
+
+- 损失函数：
+
+$$MAE=\frac{1}{n}\sum_{i=1}^{n}|y_i-\hat y_i|$$
+
+--
+
+$$MSE=\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat y_i)^2$$
+
+--
+
+
+$$Huber Loss:L_\delta (y,\hat y)=\begin{cases}
+\dfrac{1}{2}(y-\hat y)^2 & for\ |y-\hat y| \leq \delta \\
+\delta|y-\hat y|-\dfrac{1}{2}\delta^2 & otherwise 
+\end{cases}$$
+
+--
+
+- optimizer：SGD，AdaGrad，RMSprop，AdaDelta，Adam
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/MAE.png")
+```
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/Huber Loss.png")
+```
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/MSE.png")
+```
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/L1.png")
+```
+
+---
+
+class: center, middle
+
+```{r fig.align='center', echo=FALSE}
+knitr::include_graphics("image/L2.png")
+```
+
+---
+
+3.3 对比
+
+- SEIR模型和LSTM模型的RMSE比较
+
+||US|Russia|UK|Spain|Italy|Brazil|France|Germany|
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|SEIR|10278735|19031588|1082278|32304|3905940|15498478|6065767|4315|
+|LSTM|19200.5|6644.43|5508.75|1124.03|2031.12|12229.01|1674.55|1905.93|
+
+--
+
+- 全球确诊人数预测
+
+||05/19|05/20|05/21|05/22|05/23|
+|:-:|:-:|:-:|:-:|:-:|:-:|
+|SEIR|106816753|120811582|136419044|153760588|172947403|
+|LSTM|4897492|4996472|5102424|5210817|5310362|
+
+---
+
+class: center, middle
+
+## 4 讨论
+
+---
+
+
+
+
+---
+
+class: inverse, center, middle
+
+# 谢谢！
