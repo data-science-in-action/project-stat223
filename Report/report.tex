@@ -59,15 +59,13 @@ graves2013hybrid, bayer2014Learning}。
 
 \begin{figure}[htp]
 	\centering
-	\subfigure[RNN] 
-	{
+	\subfigure[RNN] {
 		\begin{minipage}{0.48\linewidth}
 			\centering
 			\includegraphics[width=7.0cm]{RNN.pdf}
 		\end{minipage}
 	}
-	\subfigure[LSTM]
-	{
+	\subfigure[LSTM] {
 		\begin{minipage}{0.48\linewidth}
 			\centering
 			\includegraphics[width=7.0cm]{LSTM.pdf}
@@ -77,11 +75,12 @@ graves2013hybrid, bayer2014Learning}。
 	\label{fig:structure}
 \end{figure}
 
-图\ref{fig:structure}显示了RNN模型与LSTM模型的结构，其中黄色框表示神经网络层，粉色的
-圆圈表示逐点运算，例如矢量加法。每条线上都承载着从一个节点的输出到另一个节点的输入的矢量
-。合并的线表示向量的连接，而分开的线表示其内容被复制，然后分配到不同的位置。由图\ref{fig:structure}
-可见，RNN与LSTM最大的区别在于——LSTM中最顶层多了一条信息传送带，即细胞状态，也就是信息记
-忆的地方，这也是LSTM的核心。
+图\ref{fig:structure}显示了RNN模型与LSTM模型的结构，其中蓝色圆圈$x_t$表示输入信息，紫
+色圆圈$h_t$表示输出信息，黄色框表示神经网络层，粉色圆圈表示逐点运算，例如矢量加法。每条
+线上都承载着从一个节点的输出到另一个节点的输入的矢量。合并的线表示向量的连接，而分开的线
+表示其内容被复制，然后分配到不同的位置。由图\ref{fig:structure}可见，RNN与LSTM最大的
+区别在于——LSTM中最顶层多了一条信息传送带，即细胞状态$C_t$，也就是信息记忆的地方，这也是LSTM
+的核心。
 
 LSTM通过称作门（gate）的结构调节，具有删除或添加信息到细胞状态的能力。门是一种选择性地让
 信息通过的方式，由$\sigma$（sigmoid）神经网络层和逐点乘法运算组成。$\sigma$层输出$0$
@@ -90,7 +89,66 @@ LSTM通过称作门（gate）的结构调节，具有删除或添加信息到细
 和一个遗忘门（forget gate）组成。细胞会记住任意时间间隔内的值，并且三个门控制着进出单元
 的信息流。
 
+LSTM模型中，第一步是决定从细胞状态中丢弃哪些信息。这个决定通过一个称为“遗忘门层”的$\sigma$
+层决定。该门会读取$h_{t-1}$和$x_t$作为输入，为细胞状态$C_t$中的每个数输出一个在$0$到$1$
+之间的数值，记为$f_t$，表示保留多少信息，$1$表示“完全保留信息”，$0$表示“完全舍弃信息”。
+\begin{equation}
+f_t=\sigma(W_{f} \cdot [h_{t-1},x_{t}]+b_{f})
+\end{equation}
 
+第二步是在细胞状态中存储哪些信息。首先是由称为“输入门层”的$\sigma$层决定哪些信息需要更
+新，该概率表示为$i_t$；然后输入门层中的tanh层创建一个新的候选值向量$\tilde{C_t}$，将其
+增加到细胞状态中。
+\begin{gather}
+i_t=\sigma(W_{i} \cdot [h_{t-1},x_{t}]+b_i) \\
+\tilde{C_t}={\rm tanh}(W_{C} \cdot [h_{t-1},x_{t}]+b_C)
+\end{gather}
+
+第三步是更新旧的细胞状态。$f_t$表示忘记上一次信息$C_t$的程度，$i_t$表示将候选值$\tilde{C_t}$
+加入的程度，通过对第二步中两个信息的结合，真正实现了移除哪些旧的信息，增加哪些新信息，最
+后得到了本细胞的状态$C_t$。
+\begin{equation}
+C_t=f_t*C_{t-1}+i_t*\tilde{C_t}
+\end{equation}
+
+最后是确定要输出的内容，即决定作出什么样的预测。首先，通过运行称为“输出门层”的$\sigma$
+层来决定输出细胞状态$C_t$的哪些部分；然后，将细胞状态通过tanh层进行处理，使值在$-1$与$1$
+之间，然后与$\sigma$层的输出相乘，最终输出决定输出的那部分。
+\begin{gather}
+o_t=\sigma(W_o \cdot [h_{t-1},x_t]+b_o) \\
+h_t=o_t*{\rm tanh}(C_t)
+\end{gather}
+
+\begin{figure}[htp]
+	\centering
+	\subfigure[遗忘门：舍弃信息] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{forget.pdf}
+		\end{minipage}
+	}
+    \subfigure[输入门：存储信息] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{input.pdf}
+		\end{minipage}
+	}
+	\\
+	\subfigure[更新细胞状态] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{update.pdf}
+		\end{minipage}
+	}
+	\subfigure[输出门：输出] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{output.pdf}
+		\end{minipage}
+	}
+    \caption{LSTM信息的流动}
+	\label{fig:LSTM}
+\end{figure}
 
 \section{实证分析}
 
