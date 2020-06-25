@@ -38,7 +38,32 @@ COVID-19已构成全球性大流行，并已蔓延到世界上大多数国家和
 \section{研究方法}
 
 \subsection{SEIR模型}
+SEIR模型将研究对象分为S、E、I、R4种类型；1）$S$为易感状态（susceptible），表示潜在的可
+感染人群，个体在感染之前是处于易感状态的，即该个体有可能被邻居个体感染。2）$E$为潜伏状态
+（exposed），表示已经被感染但没有表现出感染症状来的群体。3）$I$为感染状态（infected），
+表示表现出感染症状的人，该个体还会以一定的概率感染其能接触到的易感个体。4）$R$为移出状态
+（removed），表示脱离系统不再受到传染病影响的人。
 
+记$S(t)$、$E(t)$、$I(t)$、$R(t)$分别为时刻$t$的易感人群数、潜伏人群数、感染人群数、移出
+人群数，显然有$S(t)+E(t)+I(t)+R(t)=N$，其中$N$为种群的个体数。
+
+假设一个易感状态在单位时间$\tau$里与感染个体接触并被传染的概率为$\beta$。由于易感个体的
+比例为$S/N$，时刻$t$网络中总共有$I(t)$个感染个体，所以易感个体的数目按照如下变化率变化：
+\begin{equation}
+\frac{dS}{dt}=-\frac{\beta SI}{N}
+\end{equation}
+相应地，潜伏个体的数目按照如下变化率增加，并且整体以单位时间概率$\sigma$转化为感染个体：
+\begin{equation}
+\frac{dE}{dt}=\frac{\beta SI}{N}-\sigma E
+\end{equation}
+感染个体数目由潜伏群体提供，个体同时以单位时间概率$\gamma$转化为移除状态：
+\begin{equation}
+\frac{dI}{dt}=\sigma E-\gamma I
+\end{equation}
+相应地移除个体以概率$\gamma$由感染群体往移除个体转化：
+\begin{equation}
+\frac{dR}{dt}=\gamma I
+\end{equation}
 \subsection{LSTM模型}
 LSTM模型（Long Short-Term Memory）是一种用于深度学习领域的递归神经网络（RNN）架构在传统
 的RNN模型中，所使用的训练算法是时序反向传播算法（Back Propagation Trough 
