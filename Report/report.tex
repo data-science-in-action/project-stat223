@@ -132,13 +132,13 @@ graves2013hybrid, bayer2014Learning}。
 	\subfigure[RNN] {
 		\begin{minipage}{0.48\linewidth}
 			\centering
-			\includegraphics[width=7.0cm]{RNN.pdf}
+			\includegraphics[width=7.3cm]{RNN.pdf}
 		\end{minipage}
 	}
 	\subfigure[LSTM] {
 		\begin{minipage}{0.48\linewidth}
 			\centering
-			\includegraphics[width=7.0cm]{LSTM.pdf}
+			\includegraphics[width=7.3cm]{LSTM.pdf}
 		\end{minipage}
 	}
     \caption{RNN模型和LSTM模型的结构}
@@ -235,13 +235,13 @@ h_t=o_t*{\rm tanh}(C_t)
 	\centering
 		\begin{minipage}{0.48\linewidth}
 			\centering
-			\includegraphics[width=9.0cm]{line chart.pdf}
+			\includegraphics[width=8.8cm]{line chart.pdf}
 			\caption{六个国家的累计确诊人数}
 			\label{fig:linechart}
 		\end{minipage}
 		\begin{minipage}{0.48\linewidth}
 			\centering
-			\includegraphics[width=9.0cm]{line chart without US.pdf}
+			\includegraphics[width=8.8cm]{line chart without US.pdf}
 			\caption{五个国家的累计确诊人数}
 			\label{fig:noUS}
 		\end{minipage}
@@ -254,9 +254,11 @@ h_t=o_t*{\rm tanh}(C_t)
 
 \begin{table}[htp]
 	\centering
+	\caption{疫情数据相关指标}
+	\label{index}
 	\begin{tabular}{ccccc}
 		\hline
-		国家 & 累计确诊人数 & 死亡率 & 治愈率 & 占比 \\
+		  & 累计确诊人数 & 死亡率 & 治愈率 & 占比 \\
 		\hline
 		巴西 & 438812	& 5.0\% & 23.6\% & 0.0022 \\
 		德国 & 182452 & 2.3\%	& 42.9\% & 0.0022 \\
@@ -281,40 +283,109 @@ h_t=o_t*{\rm tanh}(C_t)
 
 \section{实证分析}
 
-\subsection{SEIR模型}
+\subsection{数据}
 
-在进行SEIR模型预测的时候我们使用到了死亡率，治愈率，国家总人口，现有确诊，死亡率治愈率计
-算时使用数据均来源于约翰霍普金斯大学的官网疫情数据。
-$死亡率=(∑_i^n▒每日累计死亡人数/每日累计确诊人数)/n$
-$治愈率=(∑_i^n▒每日累计治愈人数/每日累计确诊人数)/n$
-其中n为研究天数
-基于SEIR模型，文章预测了八个国家的疫情发展趋势，表1详细地列出了八个国家的预测结果和增长轨迹。
+本文以2020年1月22日至2020年5月24日的COVID-19疫情数据作为样本数据集。COVID-19疫情数据
+来自约翰霍普金斯大学系统科学与工程中心（CSSE）提供的\href{https://github.com/CSSEGISandData/COVID-19}{COVID-19
+全球数据库}。相关的各国人口数据来自\href{https://unstats.un.org}{联合国统计司}。
 
-接下来展示各个国家SEIR模型结果，曲线从上到下依次是国家总人口、易感人数、潜伏期人数、感染人数以及移除人数。初始阶段全国总人数是等于易感人数的，但随着疫情的传播，，易感人数在下降，同时由于死亡人数的增加国家总人口数也有所下降。最终在彼此作用下国家疫情发展会达到动态平衡的状态。
-	Brazil	France	Germany	Italy	Russia	Spain	UK	US
-Days to Peak	81	80	169	85	51	130	49	55
-Peak value（*104 active）	2261.3	744.5	104.3	499.5	6290	117.5	2965.8	13643
+\subsection{SEIR模型的模拟评估}
 
-从图中可以看出法国在疫情发生后易感人数会有一个大幅下降，也就是说，潜伏期人数的增加幅度比较大，感染人数和易感人数交叉时感染人数会达到一个顶峰。模型预测，法国会在初始日期80天后达到这个顶峰，也就是月日累计确诊人数达到顶峰，预测峰值为744.5万人。
-相较于法国，德国易感人数下降的幅度较少，感染人数和易感人数并未有交叉，模型预测德国在169天累计确诊人数达到峰值，时间处在一个比较长的跨度，表面德国疫情扩散还是处在一个比较慢的状态，且预测峰值人数也是八个国家中最少的，预测峰值人数为104.33万人。
+运用SEIR模型对疫情进行预测时，本文使用了死亡率、治愈率、国家总人口，现有确诊、死亡率和治
+愈率的计算公式如下：
+\begin{gather}
+\text{死亡率}=\frac{1}{n}\sum_{i=1}^n\frac{\text{每日累计死亡人数}}{\text{每日累计
+确诊人数}} \\
+\text{治愈率}=\frac{1}{n}\sum_{i=1}^n\frac{\text{每日累计治愈人数}}{\text{每日累计
+确诊人数}}
+\end{gather}
+其中$n$为研究区间天数。
 
-不同于别的国家，英国的SEIR曲线，易感人数和全国总人口在预测期间急速下降，最终停在了一个很低的水平，表明应该的疫情扩散极其迅速以及蔓延的后果（参照其死亡率及治愈率）特别严重。截至目前英国累计确诊人数增长还是处在一个上升的状态，如果应该政府不采取更加严格的措施的话，模型预测结果是很有可能成为现实。模型预测英国的峰值日期来临时间很短，将其设定在了初始日期后的49天，并预测最终累计确诊人数会超过一亿三千万人。这个预测结果需要政府得到重视。
-图为西班牙的SEIR模型仿真结果，西班牙有着较高的治愈率，潜伏状态和感染状态的人数都在疫情发生一百多天以后才开始加速增长，在第125天~第130天达到峰值，之后开始下降。从图上也可以很明显地看出在疫情结束后，西班牙的累计确诊人数相对较少。模型预测峰值时累计确诊人数为117万人。
+由于仍然缺乏可靠的COVID-19疫情爆发初期的数据，模型的起始日期被设定为每个国家出现第100例
+确诊病例以来的日期，这表明六个受观察国家的模型起始日期不同。基于SEIR模型，本文预测了六个
+国家的疫情发展趋势，六个国家的累计确诊人数的增长轨迹和预测结果如图\ref{fig:SEIRfit}和
+表\ref{table:SEIRprediction}所示。
 
-从美国的SEIR模型图中可以看出美国峰值感染人数处在一个极高的水平，在模型达到稳定后，国家总人口与移除人数处在了非常接近的高度，这表明，照目前美国传播速度，在疫情发展后期，美国大部分公民都将感染新型冠状病毒，易感人数数量极低，模型将峰值日期设定在了初始日期后的55天，并预测最终累计确诊人数会超过一亿三千万人。这个结果是八个国家中预测的累计确诊人数最多的。
-图为俄罗斯的SEIR模型仿真结果，由于俄罗斯治愈率相对较低，在疫情发生后的第25天~第35天潜伏状态和感染状态的人数就开始加速增长，在第41天~51天达到高峰，随后开始下降。模型预测俄罗斯的现有感染人数峰值在500万以上，相对较高。而图中也可以发现，在疫情结束后，俄罗斯累计确诊人数占全国总人数的比例也相对较高。
+\begin{figure}[htp]
+	\centering
+	\subfigure[巴西] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{Brazil_SEIR.pdf}
+		\end{minipage}
+	}
+	\subfigure[德国] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{Germany_SEIR.pdf}
+		\end{minipage}
+	}
+	\\
+	\subfigure[意大利] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{Italy_SEIR.pdf}
+		\end{minipage}
+	}
+	\subfigure[俄罗斯] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{Russia_SEIR.pdf}
+		\end{minipage}
+	}
+    \\
+    \subfigure[英国] {
+    	\begin{minipage}{0.48\linewidth}
+    		\centering
+    		\includegraphics[width=7.0cm]{UK_SEIR.pdf}
+    	\end{minipage}
+    }
+    \subfigure[美国] {
+    	\begin{minipage}{0.48\linewidth}
+    		\centering
+    		\includegraphics[width=7.0cm]{US_SEIR.pdf}
+    	\end{minipage}
+    }
+	\caption{SEIR模型的模拟}
+	\label{fig:SEIRfit}
+\end{figure}
 
-图为意大利的SEIR模型仿真结果，可以看出在疫情发展初期潜伏状态和感染状态的在都处于上升趋势，在第30天~第40天左右开始加速增长，在第75天~第85天达到高峰，之后开始下降直至消失。而在疫情结束后累计确诊人数达到499万人。
-图中可以看出巴西与意大利的SEIR结果比较类似，但不同的是，模型将巴西的峰值日期设立在了起始日期后的70~81天，较意大利峰值来临较早一点，但峰值累计确诊人数却远大于意大利，模型预测峰值时累计确诊人数会达2261.3万人，疫情扩张的结果也相当严重。
+\begin{table}[htp]
+	\centering
+	\caption{六个国家的疫情高峰预测}
+	\label{table:SEIRprediction}
+	\begin{tabular}{cccccccc}
+		\hline
+		 & 巴西 & 德国 & 意大利 & 俄罗斯 & 英国 & 美国 \\
+		\hline
+		高峰日 & 81 & 169 & 85 & 51 & 49 & 55 \\
+		峰值（*$10^4$） &　2261.3 & 104.3 & 499.5 & 6290 & 2965.8 & 13643　\\
+		\hline
+	\end{tabular}
+\end{table}
 
-
-
-
-
-
-在各国疫情折线图的起
-始日期不同，每个国家出现第100例确诊病例以来的日期被设定为起始日期，如意大利起始日期设定
-为2020那2月23日。
+从图\ref{fig:SEIRfit}中可以看出，在疫情发生后，英国的易感人数会有一个大幅下降，即潜伏
+期人数的增加幅度比较大，感染人数和易感人数交叉时感染人数会达到顶峰。模型预测，法国会在初
+始日期49天后达到这个顶峰，也就是月日累计确诊人数达到顶峰，预测峰值为2965.8万人。相较于
+法国，德国易感人数下降的幅度较少，感染人数和易感人数并未有交叉，模型预测德国在169天累计
+确诊人数达到峰值，时间跨度较长。总体上看，德国疫情扩散相对比较稳定，且预测峰值人数也是六
+个国家中最少的，预测峰值人数为104.3万人。不同于别的国家，英国的SEIR曲线，易感人数和全国
+总人口在预测期间急速下降，最终停在了一个较低的水平，表明英国的疫情扩散极其迅速以及蔓延的
+后果（参照其死亡率及治愈率）特别严重。截至目前，英国累计确诊人数增长还是处在一个上升的状态，
+如果英国政府不采取更加严格的措施，模型预测结果很有可能成为现实。模型预测英国的峰值日期来
+临时间很短，将其设定在了初始日期后的49天，并预测最终累计确诊人数会超过2900万人，这个预
+测结果应该得到政府的重视。从美国的SEIR模型图中可以看出美国峰值感染人数处在一个极高的水平，
+在模型达到稳定后，国家总人口与移出人数十分接近，这表明，照目前美国传播速度，在疫情发展后
+期，美国大部分公民都将感染新型冠状病毒，易感人数数量极低，模型将峰值日期设定在了初始日期
+后的55天，并预测最终累计确诊人数会超过13000万人，为六个国家中预测的累计确诊人数之最。由
+于俄罗斯治愈率相对较低，在疫情发生后的第25—35天，潜伏状态和感染状态的人数开始加速增长，
+在第41—51天达到高峰，随后开始下降。模型预测俄罗斯的感染人数峰值在500万以上，相对较高。
+并且，在疫情结束后，俄罗斯累计确诊人数占全国总人数的比例也相对较高。意大利的SEIR模型仿真
+结果，可以看出在疫情发展初期，潜伏状态和感染状态的人数在都处于上升趋势，在第30天—40天左
+右开始加速增长，在第75天—85天达到高峰，之后开始下降直至消失。而在疫情结束后累计确诊人数
+达到499万人。巴西与意大利的SEIR结果较为相似，但不同的是，模型将巴西的峰值日期设立在了起
+始日期后的70—81天，较意大利峰值来临较早一点，但峰值累计确诊人数却远大于意大利，模型预测
+峰值达2261.3万人，疫情扩张的结果也相当严重。
 
 \subsection{LSTM模型}
 
