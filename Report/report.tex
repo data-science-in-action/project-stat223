@@ -13,17 +13,20 @@
 \maketitle
 
 \begin{abstract}
-本文。。。。。。。
-如果想要了解本文的相关数据和程序代码，请访问
-\href{https://github.com/data-science-in-action/project-stat223}{Github::project-stat223}
+本文使用SEIR模型和LSTM模型对6个高风险国家的COVID-19疫情预测进行模拟评估，分析了SEIR模
+型和LSTM模型预测的准确性，并对COVID-19疫情的峰值和未来5天的累计确诊人数进行预测估计。本
+文的目的是帮助理解COVID-19的传播动态，了解目前的疫情发展趋势。如果想要了解本文的相关数
+据和程序代码，请访问\href{https://github.com/data-science-in-action/project-stat223}{Github::project-stat223}
 。
 \keywords{COVID-19，SEIR，LSTM，预测分析}
 \end{abstract}
 
 \section{引言}
 COVID-19已构成全球性大流行，并已蔓延到世界上大多数国家和地区。通过了解某个地区确诊病例
-的发展趋势，政府可以采取相应的政策以控制应对疫情。但是，单一的模型估计可能会得出有偏的结
-果，不同数学模型产生的预测结果是不一致的。。。。。。。
+的发展趋势，政府可以采取相应的政策以控制应对疫情。但是，面对这一新传染病及其具有许多未知
+因素的复杂特征，单一的模型估计可能会得出有偏的结果，不同数学模型产生的预测结果是不一致的
+。因此，为了实现客观地估计，我们研究并实施了两种最常用的方法：SEIR模型和LSTM模型，预测
+了COVID-19的传播扩散。
 
 \section{相关研究}
 
