@@ -309,41 +309,40 @@ h_t=o_t*{\rm tanh}(C_t)
 \begin{figure}[htp]
 	\centering
 	\subfigure[巴西] {
-		\begin{minipage}{0.48\linewidth}
+		\begin{minipage}{0.3\linewidth}
 			\centering
-			\includegraphics[width=7.0cm]{Brazil_SEIR.pdf}
+			\includegraphics[width=5.0cm]{Brazil_SEIR.pdf}
 		\end{minipage}
 	}
 	\subfigure[德国] {
-		\begin{minipage}{0.48\linewidth}
+		\begin{minipage}{0.3\linewidth}
 			\centering
-			\includegraphics[width=7.0cm]{Germany_SEIR.pdf}
+			\includegraphics[width=5.0cm]{Germany_SEIR.pdf}
 		\end{minipage}
 	}
-	\\
 	\subfigure[意大利] {
-		\begin{minipage}{0.48\linewidth}
+		\begin{minipage}{0.3\linewidth}
 			\centering
-			\includegraphics[width=7.0cm]{Italy_SEIR.pdf}
-		\end{minipage}
-	}
-	\subfigure[俄罗斯] {
-		\begin{minipage}{0.48\linewidth}
-			\centering
-			\includegraphics[width=7.0cm]{Russia_SEIR.pdf}
+			\includegraphics[width=5.0cm]{Italy_SEIR.pdf}
 		\end{minipage}
 	}
     \\
+	\subfigure[俄罗斯] {
+		\begin{minipage}{0.3\linewidth}
+			\centering
+			\includegraphics[width=5.0cm]{Russia_SEIR.pdf}
+		\end{minipage}
+	}
     \subfigure[英国] {
-    	\begin{minipage}{0.48\linewidth}
+    	\begin{minipage}{0.3\linewidth}
     		\centering
-    		\includegraphics[width=7.0cm]{UK_SEIR.pdf}
+    		\includegraphics[width=5.0cm]{UK_SEIR.pdf}
     	\end{minipage}
     }
     \subfigure[美国] {
-    	\begin{minipage}{0.48\linewidth}
+    	\begin{minipage}{0.3\linewidth}
     		\centering
-    		\includegraphics[width=7.0cm]{US_SEIR.pdf}
+    		\includegraphics[width=5.0cm]{US_SEIR.pdf}
     	\end{minipage}
     }
 	\caption{SEIR模型的模拟}
@@ -387,9 +386,150 @@ h_t=o_t*{\rm tanh}(C_t)
 始日期后的70—81天，较意大利峰值来临较早一点，但峰值累计确诊人数却远大于意大利，模型预测
 峰值达2261.3万人，疫情扩张的结果也相当严重。
 
-\subsection{LSTM模型}
+\subsection{LSTM模型的模拟评估}
+
+对于LSTM时间序列中的每个细胞状态，该单元从4个连续的日期中获取病例计数，并输出随后的第5
+个日期的预测。本文的LSTM模型是使用{\em Keras}训练的。应用以下五种优化算法：{\em Adam}
+、{\em SGD}、{\em AdaDelta}、{\em Adagrad}和{\em 
+RMSProp}，并结合以下四种损失函数：{\em MSE}、{\em MAE}、{\em Huber}以及{\em Log 
+Cosh}，比较了上述20种组合在最小化损失方面的性能。
+
+\begin{figure}[htp]
+	\centering
+	\subfigure[MSE] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{MSE.pdf}
+		\end{minipage}
+	}
+	\subfigure[MAE] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{MAE.pdf}
+		\end{minipage}
+	}
+	\\
+	\subfigure[Huber] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{Huber.pdf}
+		\end{minipage}
+	}
+	\subfigure[Log Cosh] {
+		\begin{minipage}{0.48\linewidth}
+			\centering
+			\includegraphics[width=7.0cm]{LogCosh.pdf}
+		\end{minipage}
+	}
+	\caption{不同损失函数和优化器之间的性能比较}
+	\label{fig:optnloss}
+\end{figure}
+
+如图\ref{fig:optnloss}所示，SGD是性能最差的优化器，其原因可能是SGD无法适应学习率，没有
+设置动量，训练不稳定，导致它总是围绕局部的极小值反弹波动。MAE是最差的损失函数，每个优化
+器都没有收敛到接近于零。尽管AdaDelta、AdaGrad和RMSProp在某些特定情况下的性能良好，但本
+文在接下来的实证中选择了Adam优化器和MSE损失函数相结合，因为它的收敛速度性能较为一致。并
+且，通过比较了模型在不同训练轮数（epoch）和预测步长（lookback）时的表现，最终选用训练轮数
+为70、预测步长为4。这可能是因为模型运行过少或过多会导致训练不足或训练过度，使得数据的拟
+合不足或过度拟合。将最末7天的数据集作为测试集，其余作为测试集，对各个国家的数据进行训练，
+LSTM训练模拟结果如图\ref{fig:LSTMfit}所示。
+
+\begin{figure}[htp]
+	\centering
+	\subfigure[巴西] {
+		\begin{minipage}{0.3\linewidth}
+			\centering
+			\includegraphics[width=4.8cm]{Brazil_LSTM.pdf}
+		\end{minipage}
+	}
+	\subfigure[德国] {
+		\begin{minipage}{0.3\linewidth}
+			\centering
+			\includegraphics[width=4.8cm]{Germany_LSTM.pdf}
+		\end{minipage}
+	}
+	\subfigure[意大利] {
+		\begin{minipage}{0.3\linewidth}
+			\centering
+			\includegraphics[width=4.8cm]{Italy_LSTM.pdf}
+		\end{minipage}
+	}
+	\\
+	\subfigure[俄罗斯] {
+		\begin{minipage}{0.3\linewidth}
+			\centering
+			\includegraphics[width=4.8cm]{Russia_LSTM.pdf}
+		\end{minipage}
+	}
+	\subfigure[英国] {
+		\begin{minipage}{0.3\linewidth}
+			\centering
+			\includegraphics[width=4.8cm]{UK_LSTM.pdf}
+		\end{minipage}
+	}
+	\subfigure[美国] {
+		\begin{minipage}{0.3\linewidth}
+			\centering
+			\includegraphics[width=4.8cm]{US_LSTM.pdf}
+		\end{minipage}
+	}
+	\caption{LSTM模型的模拟}
+	\label{fig:LSTMfit}
+\end{figure}
+
+\subsection{SEIR与LSTM的模型预测}
+
+将2020年1月22日至2020年5月18日的疫情数据作为训练集，分别使用SEIR模型和LSTM模型预测5月19
+日至5月24日巴西、德国、意大利、俄罗斯、英国和美国的COVID-19累计确诊人数，并比较它们的RMSE
+损失。如表\ref{table:score}所示，LSTM模型的RMSE远小于SEIR模型。
+
+\begin{table}[htp]
+	\centering
+	\caption{六个国家的预测RMSE损失比较}
+	\label{table:score}
+	\begin{tabular}{cccccccc}
+		\hline
+		& 巴西 & 德国 & 意大利 & 俄罗斯 & 英国 & 美国 \\
+		\hline
+		SEIR & 15498478 & 4315 & 3905940 & 19031588 & 1082278 & 10278735 \\
+		LSTM & 12229.01 & 1905.93 & 2031.12 & 6644.43 & 5508.75 & 19200.5 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+分别使用SEIR模型和LSTM模型对未来5天的全球COVID-19累计确诊人数进行预测，这是因为考虑所
+有国家/地区的数据，使得模型提取更多的信息，从而使得模型的准确度更高。
+
+\begin{table}[htp]
+	\centering
+	\caption{全球确诊人数预测}
+	\label{table:pred}
+	\begin{tabular}{cccccc}
+		\hline
+		& 05/25 & 05/26 & 05/27 & 05/28 & 05/29 \\
+		\hline
+		SEIR & 106816753 & 120811582 & 136419044 & 153760588 & 172947403 \\
+		LSTM & 4897492 & 4996472 & 5102424 & 5210817 & 5310362 \\
+		\hline
+	\end{tabular}
+\end{table}
 
 \section{讨论}
+
+从数理模型的角度来看，SEIR模型是用来估计传染病的，而LSTM模型则运用于时间序列预测分析。
+与SEIR模型相比，LSTM模型可以更好地拟合已有数据，因为它是经过现有数据训练的，但是无法准
+确地判断和融合传染特征。因此认为LSTM模型更适用于短期内预测。另一方面，SEIR模型通过考虑
+多人群的相互作用和关联，引入了更多的变量和因素，更符合传染病发展规律，但是在考虑不同的干
+预措施时，预测结果会有很大差异。
+
+本文存在一些局限性。数理模型通过快速合并多个输入以产生预测结果。但是，这一过程涉及到对不
+确定因素的假设，例如，很难准确地确定人们遵守当地政府的检疫政策或措施的程度，以及可能影响
+实际接触率和随后的接触率的公共行为，如洗手、带口罩、社交距离等。这些模型也缺乏足够的数据
+来估计特定人群的隔离比例。实际上，传染病的演变是相当复杂的，我们的研究只考虑了最经典的SEIR
+模型，并未对其进行展开，对于LSTM模型，没有考虑隐藏层数目、迭代次数等参数对模型的影响。此
+外，还有许多未考虑的因素，例如病毒的传播方式、人口特征、自然环境等，例如空气污染可能会加
+快病毒的传播。各国对病毒的检测率、在医疗资源（例如测试套件和进行测试的医疗专业人员）的数量
+和质量上也有所不同。
 
 \bibliography{report}
 
